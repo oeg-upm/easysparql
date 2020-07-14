@@ -2,7 +2,7 @@
 A python wrapper to easily query knowledge graphs with SPARQL
 
 [![Build Status](https://ahmad88me.semaphoreci.com/badges/easysparql.svg)](https://ahmad88me.semaphoreci.com/projects/easysparql)
-
+[![codecov](https://codecov.io/gh/oeg-upm/easysparql/branch/master/graph/badge.svg)](https://codecov.io/gh/oeg-upm/easysparql)
 
 
 
