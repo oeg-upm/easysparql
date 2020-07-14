@@ -2,10 +2,19 @@ import setuptools
 
 with open("README.md", "r") as fh:
     long_description = fh.read()
+    cleaned = ""
+    for line in long_description.split('\n')
+        if '[![Build Status]' in line:
+            pass
+        elif '[![codecov]' in line:
+            pass
+        else:
+            cleaned += line+"\n"
+    long_description = cleaned
 
 setuptools.setup(
     name="easysparql", # Replace with your own username
-    version="1.1",
+    version="1.2",
     author="Ahmad Alobaid",
     author_email="aalobaid@fi.upm.es",
     description="A python wrapper to easily query knowledge graphs with SPARQL",
