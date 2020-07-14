@@ -33,6 +33,6 @@ blocks:
             - pip install coverage codecov
             - 'export PATH=$PATH:/home/semaphore/.local/bin'
             - coverage run -m unittest discover
-            - codecov
+            - codecov -t $CODECOV_TOKEN
       secrets:
         - name: easysparql
