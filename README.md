@@ -1,7 +1,8 @@
 # easysparql
 A python wrapper to easily query knowledge graphs with SPARQL
 
-[![Build Status](https://oeg-upm.semaphoreci.com/badges/easysparql.svg?style=shields)](https://oeg-upm.semaphoreci.com/badges/easysparql.svg?style=shields)
+[![Build Status](https://ahmad88me.semaphoreci.com/badges/easysparql.svg)](https://ahmad88me.semaphoreci.com/projects/easysparql)
+
 
 
 
@@ -31,3 +32,4 @@ query = "select distinct ?Concept where {[] a ?Concept} LIMIT 100"
 results = run_query(query, DBPEDIA_ENDPOINT)
 
 ```
+

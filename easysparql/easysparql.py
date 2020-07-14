@@ -1,7 +1,5 @@
 from SPARQLWrapper import SPARQLWrapper, JSON
 import logging
-from time import sleep
-import random
 
 
 def get_logger(name, level=logging.INFO):
