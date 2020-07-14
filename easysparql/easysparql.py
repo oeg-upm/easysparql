@@ -131,46 +131,35 @@ def get_properties_of_subject(subject_uri, endpoint):
     return properties
 
 
-def get_property_count(subject_uri, property_uri, endpoint):
+# The below two functions are copied from oeg-upm/ttla
+# and are slighly updated
+def get_numerics_from_list(nums_str_list, num_perc):
     """
-    Get the number of objects for a given subject/property pair
-    :param subject_uri:
-    :param properties:
-    :return:
+    :param nums_str_list: list of string or numbers or a mix
+    :param num_perc: the percentage of numbers to non-numbers
+    :return: list of numbers or None if less than {num_perc}% are numbers
     """
-    query = """
-        select count(?o) as ?num
-        where{
-            <%s> <%s> ?o
-        }
-    """ % (subject_uri, property_uri)
-    results = run_query(query, endpoint)
-    if results != []:
-        return results[0]['num']['value']
-    else:
-        return -1
+    nums = []
+    for c in nums_str_list:
+        n = get_num(c)
+        if n is not None:
+            nums.append(n)
+    if len(nums) < len(nums_str_list) / 2:
+        return None
+    return nums
 
 
-def get_num_class_subjects(class_uri, endpoint):
-    logger.debug("count subject for class %s" % class_uri)
-    query = """
-    select count(?s) as ?num
-    where {
-    ?s a ?c.
-    ?c rdfs:subClassOf* <%s>.
-    }
-    """ % class_uri
-    results = run_query(query=query, endpoint=endpoint)
-    if results != []:
-        return results[0]['num']['value']
-    else:
-        return -1
-
-
-def get_classes_subjects_count(classes, endpoint):
-    logger.debug("in get_classes_subjects_count")
-    d = {}
-    for c in classes:
-        num = get_num_class_subjects(c, endpoint)
-        d[c] = int(num)
-    return d
+def get_num(num_or_str):
+    """
+    :param num_or_str:
+    :return: number or None if it is not a number
+    """
+    if isinstance(num_or_str, (int, float)):
+        return num_or_str
+    elif isinstance(num_or_str, basestring):
+        if '.' in num_or_str or ',' in num_or_str or num_or_str.isdigit():
+            try:
+                return float(num_or_str.replace(',', ''))
+            except Exception as e:
+                return None
+    return None

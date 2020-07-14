@@ -18,13 +18,14 @@ A python wrapper to easily query knowledge graphs with SPARQL
 
 
 # Functions
-* `run_query`: run a sparql query
-* `get_entities`: get candidate entities of the given name (exact match)
-* `get_classes`: get classes of a given entity
-* `get_parents_of_class`: get direct parent classes of a given class
+* `run_query`: run a sparql query.
+* `get_entities`: get candidate entities of the given name (exact match).
+* `get_classes`: get classes of a given entity.
+* `get_parents_of_class`: get direct parent classes of a given class.
 * `get_subjects`: Get the number of subjects of a given class.
 * `get_properties_of_subject`: Get the properties of a given subject.
-* `get_property_count`: Get the number of objects of a given subject/property pairs.
+* `get_numerics_from_list`: Get the numbers from a list of strings and numbers (if they are more that the provided percentage).
+* `get_num`: Get the number of a given number/string or None (if it was not a number).
 
 
 # Example
@@ -52,7 +53,8 @@ subjects = easysparql.get_subjects(class_uri=scientist, endpoint=DBPEDIA_ENDPOIN
 
 properties = easysparql.get_properties_of_subject(subject_uri=albert_uri, endpoint=DBPEDIA_ENDPOINT)
 
-num = easysparql.get_property_count(subject_uri=albert_uri, property_uri=foaf_name, endpoint=DBPEDIA_ENDPOINT)
+a =  ["1.2","2","4","3",3,6,"a","b", "ccc", "1jasdf"]
+nums = easysparql.get_numerics_from_list(a, 0.5)
 
 ```
 

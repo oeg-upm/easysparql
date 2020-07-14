@@ -30,9 +30,18 @@ class TestEasySPARQL(unittest.TestCase):
         properties = easysparql.get_properties_of_subject(subject_uri=albert_uri, endpoint=ENDPOINT)
         self.assertGreater(len(properties), 0, 'No properties are returned')
 
-    def test_property_count(self):
-        num = easysparql.get_property_count(subject_uri=albert_uri, property_uri=foaf_name, endpoint=ENDPOINT)
-        self.assertGreater(num, 0, 'No name is found')
+    def test_num_detection(self):
+        a = ["1.2", "2", "4", "3", 3, 6, "a", "b", "ccc", "1jasdf"]
+        nums = easysparql.get_numerics_from_list(a, num_perc=0.5)
+        self.assertIsNotNone(nums, 'the numbers in the list is more than 50%')
+        a = ["1.2", "2dfs", "df4", "3aaa", 3, 6, "a", "b", "ccc", "1jasdf"]
+        txts = easysparql.get_numerics_from_list(a, num_perc=0.5)
+        self.assertIsNone(txts, 'the numbers in the list is more than 50%')
+        self.assertEqual(1.2, easysparql.get_num("1.2"), '1.2 should be a number')
+        self.assertIsNone(easysparql.get_num("1.2.3"), '1.2.3 should not be a number')
+        self.assertIsNone(easysparql.get_num("acd1.2"), 'acd1.2 should not be a number')
+        self.assertIsNone(easysparql.get_num("abc"), 'abc should not be a number')
+        self.assertEqual(122, easysparql.get_num("122"), '122 should be a number')
 
 
 if __name__ == '__main__':

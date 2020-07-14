@@ -9,12 +9,12 @@ with open("README.md", "r") as fh:
         elif '[![codecov]' in line:
             pass
         else:
-            cleaned += line+"\n"
+            cleaned += line + "\n"
     long_description = cleaned
 
 setuptools.setup(
-    name="easysparql", # Replace with your own username
-    version="1.2",
+    name="easysparql",  # Replace with your own username
+    version="1.3",
     author="Ahmad Alobaid",
     author_email="aalobaid@fi.upm.es",
     description="A python wrapper to easily query knowledge graphs with SPARQL",
@@ -23,7 +23,7 @@ setuptools.setup(
     url="https://github.com/oeg-upm/easysparql",
     packages=setuptools.find_packages(),
     install_requires=[
-          'SPARQLWrapper',
+        'SPARQLWrapper',
     ],
     classifiers=[
         "Programming Language :: Python :: 2",
