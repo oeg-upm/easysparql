@@ -16,6 +16,17 @@ A python wrapper to easily query knowledge graphs with SPARQL
 ## Run tests
 ```python -m unittest discover```
 
+
+# Functions
+* `run_query`: run a sparql query
+* `get_entities`: get candidate entities of the given name (exact match)
+* `get_classes`: get classes of a given entity
+* `get_parents_of_class`: get direct parent classes of a given class
+* `get_subjects`: Get the number of subjects of a given class.
+* `get_properties_of_subject`: Get the properties of a given subject.
+* `get_property_count`: Get the number of objects of a given subject/property pairs.
+
+
 # Example
 ```
 from easysparql import easysparql

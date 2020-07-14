@@ -3,7 +3,7 @@ import setuptools
 with open("README.md", "r") as fh:
     long_description = fh.read()
     cleaned = ""
-    for line in long_description.split('\n')
+    for line in long_description.split('\n'):
         if '[![Build Status]' in line:
             pass
         elif '[![codecov]' in line:
