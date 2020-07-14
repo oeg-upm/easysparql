@@ -21,3 +21,10 @@ blocks:
                 - '3.5'
                 - '3.6'
       env_vars: []
+  - name: Coverage
+    task:
+      jobs:
+        - name: Coverage
+          commands:
+            - pip install coverage
+            - coverage run -m unittest discover
