@@ -65,7 +65,7 @@ def get_entities(subject_name, endpoint, language_tag=None):
     return entities
 
 
-def get_classes(entity, endpoint):
+def get_classes(entity_uri, endpoint):
     """
     :param entity: entity url without <>
     :param endpoint:
@@ -75,7 +75,7 @@ def get_classes(entity, endpoint):
         select distinct ?c where{
         <%s> a ?c
         }
-    """ % entity
+    """ % entity_uri
     results = run_query(query=query, endpoint=endpoint)
     classes = [r['c']['value'] for r in results]
     return classes
@@ -96,6 +96,61 @@ def get_parents_of_class(class_uri, endpoint):
     results = run_query(query=query, endpoint=endpoint)
     classes = [r['c']['value'] for r in results]
     return classes
+
+
+def get_subjects(class_uri, endpoint):
+    """
+    Get subjects of a given class
+    :param class_uri:
+    :param endpoint:
+    :return:
+    """
+    query = """ select ?s
+    where{
+        ?s a <%s>        
+    }
+    """ % (class_uri)
+    results = run_query(query, endpoint)
+    subjects = [r['s']['value'] for r in results]
+    return subjects
+
+
+def get_properties_of_subject(subject_uri, endpoint):
+    """
+    Get properties of a given subject
+    :param subject_uri:
+    :param endpoint:
+    :return:
+    """
+    query = """
+        select distinct ?p
+        where{
+            <%s> ?p ?o.
+        }
+    """ % (subject_uri)
+    results = run_query(query, endpoint)
+    properties = [r['p']['value'] for r in results]
+    return properties
+
+
+def get_property_count(subject_uri, property_uri, endpoint):
+    """
+    Get the number of objects for a given subject/property pair
+    :param subject_uri:
+    :param properties:
+    :return:
+    """
+    query = """
+        select count(?o) as ?num
+        where{
+            <%s> <%s> ?o
+        }
+    """ % (subject_uri, property_uri)
+    results = run_query(query, endpoint)
+    if results != []:
+        return results[0]['num']['value']
+    else:
+        return -1
 
 
 def get_num_class_subjects(class_uri, endpoint):
