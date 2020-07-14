@@ -15,7 +15,7 @@ blocks:
             - python -m pip install --upgrade pip
             - pip install -r requirements.txt
           matrix:
-            - env_vars: PYTHON_VERSION
+            - env_var: PYTHON_VERSION
               values:
                 - '2.7'
                 - '3.5'
