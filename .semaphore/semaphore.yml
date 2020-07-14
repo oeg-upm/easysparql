@@ -9,6 +9,11 @@ blocks:
     task:
       jobs:
         - name: unittest
+          commands:
+            - sem-version python $PYTHON_VERSION
+            - checkout
+            - python -m pip install --upgrade pip
+            - pip install -r requirements.txt
           matrix:
             - env_vars: PYTHON_VERSION
               values:
@@ -16,9 +21,4 @@ blocks:
                 - '3.5'
                 - '3.6'
                 - '3.7'
-          commands:
-            - sem-version python $PYTHON_VERSION
-            - checkout
-            - python -m pip install --upgrade pip
-            - pip install -r requirements.txt
       env_vars: []
