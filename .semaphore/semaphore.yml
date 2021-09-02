@@ -20,8 +20,8 @@ blocks:
             - env_var: PYTHON_VERSION
               values:
                 - '2.7'
-                - '3.5'
                 - '3.6'
+                - '3.8'
       env_vars: []
   - name: Coverage
     task:
