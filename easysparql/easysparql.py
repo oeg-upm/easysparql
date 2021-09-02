@@ -1,6 +1,11 @@
 from SPARQLWrapper import SPARQLWrapper, JSON
 import logging
 
+try:
+    basestring
+except:
+    basestring = str
+
 
 def get_logger(name, level=logging.INFO):
     # logging.basicConfig(level=logging.DEBUG)
