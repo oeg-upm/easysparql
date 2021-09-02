@@ -15,6 +15,7 @@ blocks:
             - python -m pip install --upgrade pip
             - pip install -r requirements.txt
             - 'export PATH=$PATH:/home/semaphore/.local/bin'
+            - python -m unittest discover
           matrix:
             - env_var: PYTHON_VERSION
               values:
