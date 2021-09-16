@@ -2,6 +2,7 @@ from SPARQLWrapper import SPARQLWrapper, JSON
 import os
 import hashlib
 from easysparql.cacher import Cacher
+import logging
 
 try:
     basestring
@@ -11,7 +12,7 @@ except:
 
 class EasySparql:
 
-    def __init__(self, endpoint=None, sparql_flavor="dbpedia", query_limit="", lang_tag="", cache_dir=None):
+    def __init__(self, endpoint=None, sparql_flavor="dbpedia", query_limit="", lang_tag="", cache_dir=None, logger=None):
         self.endpoint = endpoint
         self.sparql_flavor = sparql_flavor
         self.query_limit = query_limit
@@ -21,8 +22,16 @@ class EasySparql:
             if not os.path.exists(cache_dir):
                 os.mkdir(self.cache_dir)
             self.cacher = Cacher(cache_dir)
+        if logger is None:
+            logger = logging.getLogger(__name__)
+            formatter = logging.Formatter('%(asctime)s %(name)-12s %(levelname)-8s %(message)s')
+            handler = logging.NullHandler()
+            handler.setFormatter(formatter)
+            logger.addHandler(handler)
+            logger.setLevel(logging.DEBUG)
+            self.logger = logger
 
-    def run_query(self, query=None, raiseexception=False, printempty=False, keys=[]):
+    def run_query(self, query=None, raiseexception=False, printempty=False):
         if self.cacher:
             data = self.cacher.get_cache_if_any(query)
             data = self.cacher.data_to_dict(data)
@@ -30,13 +39,14 @@ class EasySparql:
                 return data
         sparql = SPARQLWrapper(endpoint=self.endpoint)
         sparql.setQuery(query=query)
-        sparql.setMethod("POST")
+        #sparql.setMethod("POST")
         sparql.setReturnFormat(JSON)
+        logger = self.logger
         try:
             results = sparql.query().convert()
             if len(results["results"]["bindings"]) > 0:
-                if self.cacher and keys!=[]:
-                    self.cacher.write_to_cache(query, results["results"]["bindings"], keys)
+                if self.cacher:
+                    self.cacher.write_results_to_cache(query, results["results"]["bindings"])
                 return results["results"]["bindings"]
             else:
                 logger.debug("returns 0 rows")
@@ -48,56 +58,14 @@ class EasySparql:
             logger.warning("query: $$<%s>$$" % str(query))
             return None
 
-    # def run_query(self, query=None, raiseexception=False, printempty=False):
-    #     """
-    #     :param query: raw SPARQL query
-    #     :param endpoint: endpoint source that hosts the data
-    #     :return: query result as a dict
-    #     """
-    #     if self.endpoint is None:
-    #         print("endpoints cannot be None")
-    #         return []
-    #     if self.cacher:
-    #         data = self.cacher.get_cache_if_any(query)
-    #         if data:
-    #             return data
-    #     sparql = SPARQLWrapper(endpoint=self.endpoint)
-    #     sparql.setQuery(query=query)
-    #     # sparql.setMethod("POST")
-    #     sparql.setReturnFormat(JSON)
-    #     # sparql.setTimeout(300)
-    #     try:
-    #         results = sparql.query().convert()
-    #         print("run_query> results: ")
-    #         print(results)
-    #         if len(results["results"]["bindings"]) > 0:
-    #             if self.cacher:
-    #                 self.cacher.write_to_cache(query, results["results"]["bindings"])
-    #             print("run_query> results: ")
-    #             print(results)
-    #             return results["results"]["bindings"]
-    #         else:
-    #             if printempty:
-    #                 print("returns 0 rows")
-    #                 print("endpoint: " + self.endpoint)
-    #                 print("query: <%s>" % str(query).strip())
-    #             return []
-    #     except Exception as e:
-    #         print(str(e))
-    #         print("sparql error: $$<%s>$$" % str(e))
-    #         print("query: $$<%s>$$" % str(query))
-    #         if raiseexception:
-    #             raise e
-    #         return []
-
     def get_entities(self, subject_name, lang_tag=""):
         """
         assuming only in the form of name@en. To be extended to other languages and other types e.g. name^^someurltype
         :param subject_name:
-        :param endpoint
+        :param lang_tag:
         :return:
         """
-        if lang_tag=="":
+        if lang_tag == "":
             lang_tag = self.lang_tag
 
         query = """
@@ -106,9 +74,7 @@ class EasySparql:
             }
         """ % (subject_name, lang_tag)
 
-        results = self.run_query(query=query, keys=['s'])
-        # print("results")
-        # print(results)
+        results = self.run_query(query=query)
         entities = [r['s']['value'] for r in results]
         return entities
 
@@ -116,7 +82,6 @@ class EasySparql:
         """
         :param subject_name:
         :param attributes:
-        :param endpoint: the SPARQL endpoint
         :return:
         """
         inner_qs = []
@@ -160,7 +125,7 @@ class EasySparql:
                 %s
             }
         """ % (inner_q)
-        results = self.run_query(query=query, keys=['s','c'])
+        results = self.run_query(query=query)
         try:
             entity_class_pair = [(r['s']['value'], r['c']['value']) for r in results]
         except:
@@ -188,7 +153,7 @@ class EasySparql:
                     ?s wdt:P31 ?c
                 }
             """ % csubject
-        results = self.run_query(query=query, keys=['s', 'c'])
+        results = self.run_query(query=query)
         try:
             entity_class_pair = [(r['s']['value'], r['c']['value']) for r in results]
         except:
@@ -199,8 +164,7 @@ class EasySparql:
     def get_parents_of_class(self, class_uri):
         """
         get the parent class of the given class, get the first results in case of multiple ones
-        :param class_name:
-        :param endpoint:
+        :param class_uri:
         :return:
         """
         if self.sparql_flavor == "dbpedia":
@@ -214,8 +178,8 @@ class EasySparql:
             select distinct ?c where{
             <%s> wdt:P279 ?c.
             }
-            """ % class_name
-        results = self.run_query(query=query, keys=['c'])
+            """ % class_uri
+        results = self.run_query(query=query)
         classes = [r['c']['value'] for r in results]
         return classes
 
@@ -227,10 +191,10 @@ class EasySparql:
         ?c rdfs:subClassOf* <%s>.
         }
         """ % class_uri
-        results = self.run_query(query=query, keys=['num'])
+        results = self.run_query(query=query)
         return results[0]['num']['value']
 
-    def clean_text(text):
+    def clean_text(self, text):
         ctext = text.replace('"', '')
         ctext = ctext.replace("'", "")
         ctext = ctext.strip()
@@ -281,7 +245,7 @@ class EasySparql:
                 <%s> ?p ?o.
             }
         """ % (subject_uri)
-        results = self.run_query(query, keys=['p'])
+        results = self.run_query(query)
         properties = [r['p']['value'] for r in results]
         return properties
 
@@ -295,7 +259,7 @@ class EasySparql:
             <%s> a ?c
             }
         """ % entity_uri
-        results = self.run_query(query=query, keys=['c'])
+        results = self.run_query(query=query)
         # print("get_classes> results:")
         # print(results)
         classes = [r['c']['value'] for r in results]

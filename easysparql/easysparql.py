@@ -64,7 +64,9 @@ def get_entities(subject_name, endpoint, language_tag=None):
         """ % (subject_name, language_tag)
 
     results = run_query(query=query, endpoint=endpoint)
-    entities = [r['s']['value'] for r in results]
+    entities = []
+    if entities:
+        entities = [r['s']['value'] for r in results]
     return entities
 
 
@@ -80,7 +82,9 @@ def get_classes(entity_uri, endpoint):
         }
     """ % entity_uri
     results = run_query(query=query, endpoint=endpoint)
-    classes = [r['c']['value'] for r in results]
+    classes = []
+    if classes:
+        classes = [r['c']['value'] for r in results]
     return classes
 
 
@@ -97,7 +101,9 @@ def get_parents_of_class(class_uri, endpoint):
     }
     """ % class_uri
     results = run_query(query=query, endpoint=endpoint)
-    classes = [r['c']['value'] for r in results]
+    classes = []
+    if results:
+        classes = [r['c']['value'] for r in results]
     return classes
 
 
@@ -114,7 +120,9 @@ def get_subjects(class_uri, endpoint):
     }
     """ % (class_uri)
     results = run_query(query, endpoint)
-    subjects = [r['s']['value'] for r in results]
+    subjects = []
+    if results:
+        subjects = [r['s']['value'] for r in results]
     return subjects
 
 
@@ -131,8 +139,11 @@ def get_properties_of_subject(subject_uri, endpoint):
             <%s> ?p ?o.
         }
     """ % (subject_uri)
+
     results = run_query(query, endpoint)
-    properties = [r['p']['value'] for r in results]
+    properties = []
+    if results:
+        properties = [r['p']['value'] for r in results]
     return properties
 
 

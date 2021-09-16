@@ -11,7 +11,6 @@ class Cacher:
 
     def get_cache_if_any(self, query):
         if not self.cache_dir:
-            print("Not cache dir")
             return None
 
         fname = hashlib.blake2b(str.encode(query)).hexdigest()+".txt"
@@ -25,7 +24,6 @@ class Cacher:
                     rows.append(row)
             f.close()
             return rows
-        # print("Cache path doesn't exists: %s" % cache_f_path)
         return None
 
     def write_to_cache(self, query, data, keys):
@@ -48,6 +46,22 @@ class Cacher:
             print("type: %s" % (str(type(data))))
             print(data)
             raise Exception("Invalid data type for data to cache. Expecting a string or a list of lists")
+
+    def write_results_to_cache(self, query, data):
+        fname = hashlib.blake2b(str.encode(query)).hexdigest()+".txt"
+        cache_f_path = os.path.join(self.cache_dir, fname)
+        f = open(cache_f_path, 'w')
+        for idx, row in enumerate(data):
+            ks = [k for k in row.keys()]
+            if idx == 0:
+                line = "\t".join(ks)
+                f.write(line)
+                f.write('\n')
+            attrs = [row[k]['value'] for k in ks]
+            line = "\t".join(attrs)
+            f.write(line)
+            f.write("\n")
+        f.close()
 
     def data_to_dict(self, rows):
         results = []

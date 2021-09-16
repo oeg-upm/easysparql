@@ -45,6 +45,12 @@ class TestEasySPARQL(unittest.TestCase):
         self.assertIsNone(easysparql.get_num("abc"), 'abc should not be a number')
         self.assertEqual(122, easysparql.get_num("122"), '122 should be a number')
 
+    def test_clean(self):
+        t = easysparql.clean_text(' "" ')
+        self.assertEqual(t, "")
+        t = easysparql.clean_text('"A"B ')
+        self.assertEqual(t, "AB")
+
 
 if __name__ == '__main__':
     unittest.main()
