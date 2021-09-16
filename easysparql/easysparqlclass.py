@@ -93,7 +93,8 @@ class EasySparql:
                 q = """
                     {
                         ?s rdfs:label "%s"@en.
-                        ?s a ?c.                        
+                        ?s ?p "%s"@en.
+                        ?s a ?c.
                     } UNION {
                         ?s rdfs:label "%s"@en.
                         ?s ?p ?e.

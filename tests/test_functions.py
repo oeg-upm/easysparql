@@ -14,6 +14,10 @@ class TestEasySPARQL(unittest.TestCase):
         entities = easysparql.get_entities(subject_name=albert_name, endpoint=ENDPOINT, language_tag="@en")
         self.assertGreater(len(entities), 0, 'No entities are returned')
 
+    def test_get_entities_and_classes(self):
+        pairs = easysparql.get_entities_and_classes(albert_name, endpoint=ENDPOINT, attributes=["Switzerland"])
+        self.assertGreater(len(pairs), 0, 'No pairs are returned')
+
     def test_get_classes(self):
         classes = easysparql.get_classes(entity_uri=albert_uri, endpoint=ENDPOINT)
         self.assertGreater(len(classes), 0, 'No classes are returned')

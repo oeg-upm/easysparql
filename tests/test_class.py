@@ -51,6 +51,10 @@ class TestEasySPARQL(unittest.TestCase):
         t = easysparql.clean_text('"A"B ')
         self.assertEqual(t, "AB")
 
+    def test_get_entities_and_classes(self):
+        pairs = easysparql.get_entities_and_classes(albert_name, ["Switzerland"])
+        self.assertGreater(len(pairs), 0)
+
 
 if __name__ == '__main__':
     unittest.main()

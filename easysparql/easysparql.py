@@ -179,3 +179,50 @@ def get_num(num_or_str):
             except Exception as e:
                 return None
     return None
+
+
+def get_entities_and_classes(subject_name, attributes, endpoint):
+    """
+    :param subject_name:
+    :param attributes:
+    :param endpoint: the SPARQL endpoint
+    :return:
+    """
+    inner_qs = []
+    csubject = clean_text(subject_name)
+    for attr in attributes:
+        cattr = clean_text(attr)
+        q = """
+            {
+                ?s rdfs:label "%s"@en.
+                ?s ?p "%s"@en.
+                ?s a ?c.
+            } UNION {
+                ?s rdfs:label "%s"@en.
+                ?s ?p ?e.
+                ?e rdfs:label "%s"@en.
+                ?s a ?c.
+            }
+        """ % (csubject, cattr, csubject, cattr)
+        inner_qs.append(q)
+
+    inner_q = "UNION".join(inner_qs)
+
+    query = """
+        select distinct ?s ?c where{
+            %s
+        }
+    """ % (inner_q)
+    results = run_query(query=query, endpoint=endpoint)
+    try:
+        entity_class_pair = [(r['s']['value'], r['c']['value']) for r in results]
+    except:
+        entity_class_pair = []
+    return entity_class_pair
+
+
+def clean_text( text):
+    ctext = text.replace('"', '')
+    ctext = ctext.replace("'", "")
+    ctext = ctext.strip()
+    return ctext
