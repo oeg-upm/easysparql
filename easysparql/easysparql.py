@@ -26,7 +26,7 @@ def run_query(query, endpoint):
     """
     sparql = SPARQLWrapper(endpoint=endpoint)
     sparql.setQuery(query=query)
-    sparql.setMethod("POST")
+    # sparql.setMethod("POST")
     sparql.setReturnFormat(JSON)
     try:
         results = sparql.query().convert()
@@ -65,7 +65,7 @@ def get_entities(subject_name, endpoint, language_tag=None):
 
     results = run_query(query=query, endpoint=endpoint)
     entities = []
-    if entities:
+    if results:
         entities = [r['s']['value'] for r in results]
     return entities
 
@@ -83,7 +83,7 @@ def get_classes(entity_uri, endpoint):
     """ % entity_uri
     results = run_query(query=query, endpoint=endpoint)
     classes = []
-    if classes:
+    if results:
         classes = [r['c']['value'] for r in results]
     return classes
 
