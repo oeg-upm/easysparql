@@ -9,6 +9,8 @@ albert_uri = "http://dbpedia.org/resource/Albert_Einstein"
 albert_name = "Albert Einstein"
 scientist = "http://dbpedia.org/ontology/Scientist"
 foaf_name = "http://xmlns.com/foaf/0.1/name"
+isaac_name = "Isaac Newton"
+isaac_uri = "http://dbpedia.org/resource/Isaac_Newton"
 cacher = cacher.Cacher(".cache")
 
 
@@ -19,7 +21,7 @@ class TestCache(unittest.TestCase):
             select distinct ?s where{
                 ?s ?p "%s"%s
             }
-        """ % (albert_name, "@en")
+        """ % (isaac_name, "@en")
 
         fname = hashlib.blake2b(str.encode(query)).hexdigest()+".txt"
         cache_f_path = os.path.join(".cache", fname)
@@ -28,13 +30,13 @@ class TestCache(unittest.TestCase):
 
         results = easysparql.run_query(query=query, endpoint=ENDPOINT)
         data = [r['s']['value'] for r in results]
-        self.assertEqual(albert_uri, data[0])
+        self.assertIn(isaac_uri, data)
         self.assertFalse(os.path.exists(cache_f_path))
         self.assertIsNone(cacher.get_cache_if_any(query))
-        cacher.write_to_cache(query, [[albert_uri]], keys=['s'])
+        cacher.write_to_cache(query, [[isaac_uri]], keys=['s'])
         data = cacher.get_cache_if_any(query)
         self.assertIsNotNone(data)
-        self.assertEqual(albert_uri, data[0][0])
+        self.assertEqual(isaac_uri, data[0][0])
 
     def test_empty_cache(self):
         query = """
@@ -49,8 +51,9 @@ class TestCache(unittest.TestCase):
             os.remove(cache_f_path)
 
         results = easysparql.run_query(query=query, endpoint=ENDPOINT)
-        data = [r['s']['value'] for r in results]
-        self.assertEqual(data, [])
+        # data = [r['s']['value'] for r in results]
+        self.assertEqual(results, [])
+        # self.assertIsNone(results)
         self.assertFalse(os.path.exists(cache_f_path))
         self.assertIsNone(cacher.get_cache_if_any(query))
         cacher.write_results_to_cache(query, [])

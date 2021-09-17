@@ -1,5 +1,6 @@
 import unittest
 from easysparql import easysparqlclass, cacher
+import logging
 
 ENDPOINT = "https://dbpedia.org/sparql"
 albert_uri = "http://dbpedia.org/resource/Albert_Einstein"
@@ -7,7 +8,15 @@ albert_name = "Albert Einstein"
 scientist = "http://dbpedia.org/ontology/Scientist"
 foaf_name = "http://xmlns.com/foaf/0.1/name"
 
-easysparql = easysparqlclass.EasySparql(endpoint=ENDPOINT, lang_tag="@en", cache_dir=".cache")
+logger = logging.getLogger(__name__)
+formatter = logging.Formatter('%(asctime)s %(name)-12s %(levelname)-8s %(message)s')
+handler = logging.NullHandler()
+handler.setFormatter(formatter)
+logger.addHandler(handler)
+logger.setLevel(logging.ERROR)
+logger = None
+
+easysparql = easysparqlclass.EasySparql(endpoint=ENDPOINT, lang_tag="@en", logger=logger, cache_dir=".cache")
 
 
 class TestEasySPARQL(unittest.TestCase):

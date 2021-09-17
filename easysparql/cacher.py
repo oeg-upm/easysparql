@@ -15,6 +15,7 @@ class Cacher:
 
         fname = hashlib.blake2b(str.encode(query)).hexdigest()+".txt"
         cache_f_path = os.path.join(self.cache_dir, fname)
+        # print("cache: "+cache_f_path)
         rows = []
         if os.path.exists(cache_f_path):
             f = open(cache_f_path)
@@ -65,7 +66,7 @@ class Cacher:
 
     def data_to_dict(self, rows):
         results = []
-        if rows and len(rows)> 0:
+        if rows and len(rows) > 0:
             keys = rows[0]
             for i in range(1, len(rows)):
                 d = dict()

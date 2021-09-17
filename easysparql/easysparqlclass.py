@@ -22,7 +22,7 @@ class EasySparql:
         self.cacher = None
         if cache_dir:
             if not os.path.exists(cache_dir):
-                os.mkdir(self.cache_dir)
+                os.mkdir(cache_dir)
             self.cacher = Cacher(cache_dir)
         if logger is None:
             logger = logging.getLogger(__name__)
@@ -37,10 +37,16 @@ class EasySparql:
         logger = self.logger
         if self.cacher:
             data = self.cacher.get_cache_if_any(query)
-            data = self.cacher.data_to_dict(data)
-            if data:
+            if data is not None:
                 self.logger.debug("cache is found")
+                data = self.cacher.data_to_dict(data)
                 return data
+            # old - it is kept for the tests
+            # data = self.cacher.data_to_dict(data)
+            # if data:
+            #     self.logger.debug("cache is found")
+            #     return data
+
         self.logger.debug("cache is not found for: <%s>" % query)
         sparql = SPARQLWrapper(endpoint=self.endpoint)
         sparql.setQuery(query=query)
@@ -80,7 +86,7 @@ class EasySparql:
                 ?s ?p "%s"%s
             }
         """ % (subject_name, lang_tag)
-
+        # print("query: <%s>" % query)
         results = self.run_query(query=query)
         entities = []
         if results:
