@@ -12,11 +12,13 @@ except:
 
 class EasySparql:
 
-    def __init__(self, endpoint=None, sparql_flavor="dbpedia", query_limit="", lang_tag="", cache_dir=None, logger=None):
+    def __init__(self, endpoint=None, sparql_flavor="dbpedia", query_limit="", lang_tag="", cache_dir=None,
+                 sparql_req_post=False, logger=None):
         self.endpoint = endpoint
         self.sparql_flavor = sparql_flavor
         self.query_limit = query_limit
         self.lang_tag = lang_tag
+        self.sparql_req_post = sparql_req_post
         self.cacher = None
         if cache_dir:
             if not os.path.exists(cache_dir):
@@ -24,24 +26,27 @@ class EasySparql:
             self.cacher = Cacher(cache_dir)
         if logger is None:
             logger = logging.getLogger(__name__)
-            formatter = logging.Formatter('%(asctime)s %(name)-12s %(levelname)-8s %(message)s')
-            handler = logging.NullHandler()
-            handler.setFormatter(formatter)
-            logger.addHandler(handler)
-            logger.setLevel(logging.DEBUG)
-            self.logger = logger
+            # formatter = logging.Formatter('%(asctime)s %(name)-12s %(levelname)-8s %(message)s')
+            # handler = logging.NullHandler()
+            # handler.setFormatter(formatter)
+            # logger.addHandler(handler)
+            # logger.setLevel(logging.ERROR)
+        self.logger = logger
 
     def run_query(self, query=None, raiseexception=False, printempty=False):
+        logger = self.logger
         if self.cacher:
             data = self.cacher.get_cache_if_any(query)
             data = self.cacher.data_to_dict(data)
             if data:
+                self.logger.debug("cache is found")
                 return data
+        self.logger.debug("cache is not found for: <%s>" % query)
         sparql = SPARQLWrapper(endpoint=self.endpoint)
         sparql.setQuery(query=query)
-        #sparql.setMethod("POST")
+        if self.sparql_req_post:
+            sparql.setMethod("POST")
         sparql.setReturnFormat(JSON)
-        logger = self.logger
         try:
             results = sparql.query().convert()
             if len(results["results"]["bindings"]) > 0:
@@ -49,8 +54,10 @@ class EasySparql:
                     self.cacher.write_results_to_cache(query, results["results"]["bindings"])
                 return results["results"]["bindings"]
             else:
+                # to use the cache in the case of no results
+                self.cacher.write_results_to_cache(query, [])
                 logger.debug("returns 0 rows")
-                logger.debug("query: <%s>" % str(query).strip())
+                # logger.debug("query: <%s>" % str(query).strip())
                 return []
         except Exception as e:
             logger.warning(str(e))
@@ -75,7 +82,9 @@ class EasySparql:
         """ % (subject_name, lang_tag)
 
         results = self.run_query(query=query)
-        entities = [r['s']['value'] for r in results]
+        entities = []
+        if results:
+            entities = [r['s']['value'] for r in results]
         return entities
 
     def get_entities_and_classes(self, subject_name, attributes):
@@ -127,10 +136,14 @@ class EasySparql:
             }
         """ % (inner_q)
         results = self.run_query(query=query)
-        try:
+        entity_class_pair = []
+        if results:
             entity_class_pair = [(r['s']['value'], r['c']['value']) for r in results]
-        except:
-            entity_class_pair = []
+
+        # try:
+        #     entity_class_pair = [(r['s']['value'], r['c']['value']) for r in results]
+        # except:
+        #     entity_class_pair = []
         return entity_class_pair
 
     def get_entities_and_classes_naive(self, subject_name):
@@ -155,10 +168,13 @@ class EasySparql:
                 }
             """ % csubject
         results = self.run_query(query=query)
-        try:
+        entity_class_pair = []
+        if results:
             entity_class_pair = [(r['s']['value'], r['c']['value']) for r in results]
-        except:
-            entity_class_pair = []
+        # try:
+        #     entity_class_pair = [(r['s']['value'], r['c']['value']) for r in results]
+        # except:
+        #     entity_class_pair = []
 
         return entity_class_pair
 
@@ -181,7 +197,9 @@ class EasySparql:
             }
             """ % class_uri
         results = self.run_query(query=query)
-        classes = [r['c']['value'] for r in results]
+        classes = []
+        if results:
+            classes = [r['c']['value'] for r in results]
         return classes
 
     def get_num_class_subjects(self, class_uri):
@@ -193,7 +211,9 @@ class EasySparql:
         }
         """ % class_uri
         results = self.run_query(query=query)
-        return results[0]['num']['value']
+        if results:
+            return results[0]['num']['value']
+        return []
 
     def clean_text(self, text):
         ctext = text.replace('"', '')
@@ -247,7 +267,9 @@ class EasySparql:
             }
         """ % (subject_uri)
         results = self.run_query(query)
-        properties = [r['p']['value'] for r in results]
+        properties = []
+        if results:
+            properties = [r['p']['value'] for r in results]
         return properties
 
     def get_classes(self, entity_uri):
@@ -263,7 +285,9 @@ class EasySparql:
         results = self.run_query(query=query)
         # print("get_classes> results:")
         # print(results)
-        classes = [r['c']['value'] for r in results]
+        classes = []
+        if results:
+            classes = [r['c']['value'] for r in results]
         return classes
 
     def get_subjects(self, class_uri):
@@ -279,5 +303,7 @@ class EasySparql:
         }
         """ % (class_uri)
         results = self.run_query(query)
-        subjects = [r['s']['value'] for r in results]
+        subjects = []
+        if results:
+            subjects = [r['s']['value'] for r in results]
         return subjects

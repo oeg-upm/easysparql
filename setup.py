@@ -14,7 +14,7 @@ with open("README.md", "r") as fh:
 
 setuptools.setup(
     name="easysparql",  # Replace with your own username
-    version="1.5.1",
+    version="1.5.3",
     author="Ahmad Alobaid",
     author_email="aalobaid@fi.upm.es",
     description="A python wrapper to easily query knowledge graphs with SPARQL",
