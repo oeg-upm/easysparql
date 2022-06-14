@@ -3,6 +3,8 @@ import os
 import hashlib
 from easysparql.cacher import Cacher
 import logging
+from easysparql.easysparql import get_url_stripped
+
 
 try:
     basestring
@@ -276,6 +278,29 @@ class EasySparql:
         properties = []
         if results:
             properties = [r['p']['value'] for r in results]
+        return properties
+
+    def get_class_properties(self, class_uri, min_num=30):
+        """
+        Get properties of the given class
+        :param class_uri:
+        :return:
+        """
+
+        class_uri_stripped = get_url_stripped(class_uri)
+        query = """
+                    SELECT ?p (count(distinct ?s) as ?num)
+                    WHERE {
+                        ?s a <%s>.
+                        ?s ?p[]
+                    }
+                    group by ?p
+                    order by desc(?num)
+                """ % class_uri_stripped
+        results = self.run_query(query=query)
+        properties = []
+        if results:
+            properties = [r['p']['value'] for r in results if int(r['num']['value']) >= min_num]
         return properties
 
     def get_classes(self, entity_uri):

@@ -47,6 +47,10 @@ class TestEasySPARQL(unittest.TestCase):
         self.assertIsNone(easysparql.get_num("abc"), 'abc should not be a number')
         self.assertEqual(122, easysparql.get_num("122"), '122 should be a number')
 
+    def test_get_class_properties(self):
+        properties = easysparql.get_class_properties(endpoint=ENDPOINT, class_uri=scientist)
+        self.assertGreater(len(properties), 0, 'No properties are returned')
+
 
 if __name__ == '__main__':
     unittest.main()

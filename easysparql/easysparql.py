@@ -43,6 +43,38 @@ def run_query(query, endpoint):
         return None
 
 
+def get_class_properties(endpoint=None, class_uri=None, min_num=30):
+    """
+    :param endpoint:
+    :param class_uri:
+    :return:
+    """
+
+    if class_uri is None:
+        print("get_class_properties> class_uri should not be None")
+        raise Exception("class_uri is missing")
+    class_uri_stripped = get_url_stripped(class_uri)
+    query = """
+                SELECT ?p (count(distinct ?s) as ?num)
+                WHERE {
+                    ?s a <%s>.
+                    ?s ?p[]
+                }
+                group by ?p
+                order by desc(?num)
+            """ % class_uri_stripped
+    results = run_query(query=query, endpoint=endpoint)
+    properties = []
+    if results:
+        # print(results)
+        # for r in results:
+        #     print(r)
+        #     print(r['p']['value'])
+        #     print(r['num']['value'])
+        properties = [r['p']['value'] for r in results if int(r['num']['value']) >= min_num]
+    return properties
+
+
 def get_entities(subject_name, endpoint, language_tag=None):
     """
     assuming only in the form of name@en. To be extended to other languages and other types e.g. name^^someurltype
@@ -226,3 +258,16 @@ def clean_text( text):
     ctext = ctext.replace("'", "")
     ctext = ctext.strip()
     return ctext
+
+
+def get_url_stripped(uri):
+    """
+    :param uri:  <uri> or uri
+    :return: uri
+    """
+    uri_stripped = uri.strip()
+    if uri_stripped[0] == "<":
+        uri_stripped = uri_stripped[1:]
+    if uri_stripped[-1] == ">":
+        uri_stripped = uri_stripped[:-1]
+    return uri_stripped
