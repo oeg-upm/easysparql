@@ -75,6 +75,25 @@ def get_class_properties(endpoint=None, class_uri=None, min_num=30):
     return properties
 
 
+def get_objects(endpoint, class_uri, property_uri):
+    """
+    :param endpoint:
+    :param class_uri:
+    :param property_uri:
+    :return:
+    """
+    class_uri_stripped = get_url_stripped(class_uri)
+    property_uri_stripped = get_url_stripped(property_uri)
+    query = """
+        select ?o where{ ?s  a <%s>. ?s <%s> ?o}
+    """ % (class_uri_stripped, property_uri_stripped)
+    objects = []
+    results = run_query(query=query, endpoint=endpoint)
+    if results:
+        objects = [o['o']['value'] for o in results]
+    return objects
+
+
 def get_entities(subject_name, endpoint, language_tag=None):
     """
     assuming only in the form of name@en. To be extended to other languages and other types e.g. name^^someurltype

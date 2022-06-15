@@ -14,7 +14,7 @@ with open("README.md", "r") as fh:
 
 setuptools.setup(
     name="easysparql",  # Replace with your own username
-    version="1.5.4",
+    version="1.6.1",
     author="Ahmad Alobaid",
     author_email="aalobaid@fi.upm.es",
     description="A python wrapper to easily query knowledge graphs with SPARQL",
@@ -26,7 +26,6 @@ setuptools.setup(
         'SPARQLWrapper',
     ],
     classifiers=[
-        # "Programming Language :: Python :: 2",
         "Programming Language :: Python :: 3",
         "License :: OSI Approved :: Apache Software License",
         "Operating System :: OS Independent",

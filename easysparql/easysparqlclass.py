@@ -303,6 +303,23 @@ class EasySparql:
             properties = [r['p']['value'] for r in results if int(r['num']['value']) >= min_num]
         return properties
 
+    def get_objects(self, class_uri, property_uri):
+        """
+        :param class_uri:
+        :param property_uri:
+        :return:
+        """
+        class_uri_stripped = get_url_stripped(class_uri)
+        property_uri_stripped = get_url_stripped(property_uri)
+        query = """
+            select ?o where{ ?s  a <%s>. ?s <%s> ?o} %s
+        """ % (class_uri_stripped, property_uri_stripped, QUERY_LIMIT)
+        objects = []
+        results = run_query(query=query)
+        if results:
+            objects = [o['o']['value'] for o in objects]
+        return objects
+
     def get_classes(self, entity_uri):
         """
         :param entity: entity url without <>
