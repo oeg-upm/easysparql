@@ -18,6 +18,11 @@ A python wrapper to easily query knowledge graphs with SPARQL
 ## Run tests
 ```python -m unittest discover```
 
+# To publish
+```
+python setup.py sdist bdist_wheel
+twine upload dist/*
+```
 
 # Functions
 * `run_query`: run a sparql query.
