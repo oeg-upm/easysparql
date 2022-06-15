@@ -41,6 +41,10 @@ class TestEasySPARQL(unittest.TestCase):
         properties = easysparql.get_properties_of_subject(subject_uri=albert_uri)
         self.assertGreater(len(properties), 0, 'No properties are returned')
 
+    def test_objects_properties(self):
+        objects = easysparql.get_objects(class_uri=scientist, property_uri=foaf_name)
+        self.assertGreater(len(objects), 0, 'No objects are returned')
+
     def test_get_class_properties(self):
         properties = easysparql.get_class_properties(class_uri=scientist)
         self.assertGreater(len(properties), 0, 'No properties are returned')

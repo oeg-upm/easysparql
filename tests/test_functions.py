@@ -34,6 +34,10 @@ class TestEasySPARQL(unittest.TestCase):
         properties = easysparql.get_properties_of_subject(subject_uri=albert_uri, endpoint=ENDPOINT)
         self.assertGreater(len(properties), 0, 'No properties are returned')
 
+    def test_objects_properties(self):
+        objects = easysparql.get_objects(class_uri=scientist, property_uri=foaf_name, endpoint=ENDPOINT)
+        self.assertGreater(len(objects), 0, 'No objects are returned')
+
     def test_num_detection(self):
         a = ["1.2", "2", "4", "3", 3, 6, "a", "b", "ccc", "1jasdf"]
         nums = easysparql.get_numerics_from_list(a, num_perc=0.5)
